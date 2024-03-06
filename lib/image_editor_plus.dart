@@ -42,7 +42,12 @@ class ImageEditor extends StatelessWidget {
   final List? images;
   final String? savePath;
   final int outputFormat;
-  final Function(BuildContext)? onDone;
+
+  /// 이미지 한 장일 때
+  /// OutputFormat이 json일 경우에는 json으로 반환하고, 그 외에는 Uint8List를 반환
+  /// 이미지 여러 장일 때
+  /// List<ImageItem> 반환
+  final Function(BuildContext, dynamic)? onDone;
 
   final o.ImagePickerOption imagePickerOption;
   final o.CropOption? cropOption;
@@ -153,7 +158,7 @@ class MultiImageEditor extends StatefulWidget {
   final List images;
   final String? savePath;
   final int outputFormat;
-  final Function(BuildContext)? onDone;
+  final Function(BuildContext, dynamic)? onDone;
 
   final o.ImagePickerOption imagePickerOption;
   final o.CropOption? cropOption;
@@ -272,7 +277,8 @@ class _MultiImageEditorState extends State<MultiImageEditor> {
               padding: const EdgeInsets.symmetric(horizontal: 8),
               icon: const Icon(Icons.check),
               onPressed: () async {
-                widget.onDone?.call(context) ?? Navigator.pop(context, images);
+                widget.onDone?.call(context, images) ??
+                    Navigator.pop(context, images);
               },
             ),
           ],
@@ -408,7 +414,7 @@ class SingleImageEditor extends StatefulWidget {
   final dynamic image;
   final String? savePath;
   final int outputFormat;
-  final Function(BuildContext)? onDone;
+  final Function(BuildContext, dynamic)? onDone;
 
   final o.ImagePickerOption imagePickerOption;
   final o.CropOption? cropOption;
@@ -584,7 +590,7 @@ class _SingleImageEditorState extends State<SingleImageEditor> {
                   loadingScreen.hide();
 
                   if (mounted) {
-                    widget.onDone?.call(context) ??
+                    widget.onDone?.call(context, json) ??
                         Navigator.pop(context, json);
                   }
                 } else {
@@ -594,7 +600,7 @@ class _SingleImageEditorState extends State<SingleImageEditor> {
                   loadingScreen.hide();
 
                   if (mounted) {
-                    widget.onDone?.call(context) ??
+                    widget.onDone?.call(context, editedImageBytes) ??
                         Navigator.pop(context, editedImageBytes);
                   }
                 }
