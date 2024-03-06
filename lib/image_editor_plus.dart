@@ -42,6 +42,7 @@ class ImageEditor extends StatelessWidget {
   final List? images;
   final String? savePath;
   final int outputFormat;
+  final Function(BuildContext)? onDone;
 
   final o.ImagePickerOption imagePickerOption;
   final o.CropOption? cropOption;
@@ -58,6 +59,7 @@ class ImageEditor extends StatelessWidget {
     this.image,
     this.images,
     this.savePath,
+    this.onDone,
     this.imagePickerOption = const o.ImagePickerOption(),
     this.outputFormat = o.OutputFormat.jpeg,
     this.cropOption = const o.CropOption(),
@@ -84,6 +86,7 @@ class ImageEditor extends StatelessWidget {
       return SingleImageEditor(
         image: image,
         savePath: savePath,
+        onDone: onDone,
         imagePickerOption: imagePickerOption,
         outputFormat: outputFormat,
         cropOption: cropOption,
@@ -99,6 +102,7 @@ class ImageEditor extends StatelessWidget {
       return MultiImageEditor(
         images: images ?? [],
         savePath: savePath,
+        onDone: onDone,
         imagePickerOption: imagePickerOption,
         outputFormat: outputFormat,
         cropOption: cropOption,
@@ -149,6 +153,7 @@ class MultiImageEditor extends StatefulWidget {
   final List images;
   final String? savePath;
   final int outputFormat;
+  final Function(BuildContext)? onDone;
 
   final o.ImagePickerOption imagePickerOption;
   final o.CropOption? cropOption;
@@ -164,6 +169,7 @@ class MultiImageEditor extends StatefulWidget {
     super.key,
     this.images = const [],
     this.savePath,
+    this.onDone,
     this.imagePickerOption = const o.ImagePickerOption(),
     this.outputFormat = o.OutputFormat.jpeg,
     this.cropOption = const o.CropOption(),
@@ -266,7 +272,7 @@ class _MultiImageEditorState extends State<MultiImageEditor> {
               padding: const EdgeInsets.symmetric(horizontal: 8),
               icon: const Icon(Icons.check),
               onPressed: () async {
-                Navigator.pop(context, images);
+                widget.onDone?.call(context) ?? Navigator.pop(context, images);
               },
             ),
           ],
@@ -402,6 +408,7 @@ class SingleImageEditor extends StatefulWidget {
   final dynamic image;
   final String? savePath;
   final int outputFormat;
+  final Function(BuildContext)? onDone;
 
   final o.ImagePickerOption imagePickerOption;
   final o.CropOption? cropOption;
@@ -417,6 +424,7 @@ class SingleImageEditor extends StatefulWidget {
     super.key,
     this.image,
     this.savePath,
+    this.onDone,
     this.imagePickerOption = const o.ImagePickerOption(),
     this.outputFormat = o.OutputFormat.jpeg,
     this.cropOption = const o.CropOption(),
@@ -575,14 +583,20 @@ class _SingleImageEditorState extends State<SingleImageEditor> {
 
                   loadingScreen.hide();
 
-                  if (mounted) Navigator.pop(context, json);
+                  if (mounted) {
+                    widget.onDone?.call(context) ??
+                        Navigator.pop(context, json);
+                  }
                 } else {
                   var editedImageBytes =
                       await getMergedImage(widget.outputFormat & 0xFE);
 
                   loadingScreen.hide();
 
-                  if (mounted) Navigator.pop(context, editedImageBytes);
+                  if (mounted) {
+                    widget.onDone?.call(context) ??
+                        Navigator.pop(context, editedImageBytes);
+                  }
                 }
               },
             ),
